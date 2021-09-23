@@ -1,10 +1,10 @@
 ## Foam-Extend-4.1 with Docker
 
-Allows for running multiple (SSH-connected) docker containers which have Foam-extend-4.1 (nextRelease branch)
+Allows for running multiple (SSH-connected) Docker containers which have Foam-extend-4.1 (nextRelease branch)
 compiled with system OpenMPI (Ubuntu 18.04).
 
 Shamelessly based on [docker.openmpi](https://github.com/oweidner/docker.openmpi).
-We don't really need their MPI4Py but It's nice to have it, so I'm keeping it.
+We don't really need their MPI4Py so I'm not keeping it.
 
 
 ## MPI-powered FE4 Container Cluster with `docker-compose`

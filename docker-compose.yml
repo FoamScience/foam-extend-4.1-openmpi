@@ -1,34 +1,43 @@
-mpi_head:
-    build: .
-    # image: openmpi
-    ports: 
-      - "22"
-    links: 
-      - mpi_node
+master:
+  image: fe4-mpi
+  ports: 
+   - "22"
+  volumes:
+   - data:/data
+  links: 
+   - slave
 
-mpi_node:
-    build: .
-    # image: openmpi
+slave: 
+  image: fe4-mpi
+  volumes:
+   - data:/data
 
+volumes:
+  data:
+    external: true
 
 # version: "2"
 
 # services:
-#   mpi_head:
-#     build: .
-#     # image: openmpi
+#   master:
+#     image: fe4-mpi
 #     ports: 
 #       - "22"
 #     links: 
-#       - mpi_node
+#       - slave
+#     volumes:
+#       - data:/data
 #     networks:
 #       - net
 
-#   mpi_node:
-#     build: .
-#     # image: openmpi
+#   slave:
+#     image: fe4-mpi
 #     networks:
 #       - net
+
+# volumes:
+#   data:
+#     external: true
 
 # networks:
 #   net:
