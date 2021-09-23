@@ -1,64 +1,46 @@
-## docker.openmpi
+## Foam-Extend-4.1 with Docker
 
-Travis CI: [![Build Status](https://travis-ci.org/ocramz/docker.openmpi.svg?branch=master)](https://travis-ci.org/ocramz/docker.openmpi)
+Allows for running multiple (SSH-connected) docker containers which have Foam-extend-4.1 (nextRelease branch)
+compiled with system OpenMPI (Ubuntu 18.04).
 
-With the code in this repository, you can build a Docker container that provides 
-the OpenMPI runtime and tools along with various supporting libaries, 
-including the MPI4Py Python bindings. The container also runs an OpenSSH server
-so that multiple containers can be linked together and used via `mpirun`.
+Shamelessly based on [docker.openmpi](https://github.com/oweidner/docker.openmpi).
+We don't really need their MPI4Py but It's nice to have it, so I'm keeping it.
 
 
-## MPI Container Cluster with `docker-compose`
+## MPI-powered FE4 Container Cluster with `docker-compose`
 
-While containers can in principle be started manually via `docker run`, we suggest that your use 
-[Docker Compose](https://docs.docker.com/compose/), a simple command-line tool 
-to define and run multi-container applications. We provide a sample `docker-compose.yml` file in the repository:
+Put something like this in a `docker-compose.yml` file:
 
 ```
-mpi_head:
-  image: openmpi
+master:
+  image: fe4-openmpi
   ports: 
    - "22"
+  volumes:
+   - data:/data
   links: 
-   - mpi_node
+   - slave
 
-mpi_node: 
-  image: openmpi
+slave: 
+  image: fe4-openmpi
+  volumes:
+   - data:/data
 
+volumes:
+  data:
+    external: true
 ```
 (Note: the above is docker-compose API version 1)
 
-The file defines an `mpi_head` and an `mpi_node`. Both containers run the same `openmpi` image. 
-The only difference is, that the `mpi_head` container exposes its SSH server to 
-the host system, so you can log into it to start your MPI applications.
+With this, you define a master container (should instantiate only 1 of those) which is
+linked to some slave containers (you can get as many as you want),
+and can be accessed from the host machine on SSH port 22. Both container types will mount
+an external volume (called data) at `/data`.
 
-
-## Usage
-
-The following command, run from the repository's directory, will start one `mpi_head` container and three `mpi_node` containers: 
-
+For the impatient, bootstrap your make-believe cluster with (In case of 4 CPUs for example):
 ```
-$> docker-compose scale mpi_head=1 mpi_node=3
+> docker volume create data
+> docker-compose scale master=1 slave=3
 ```
-Once all containers are running, you can login into the `mpi_head` node and start MPI jobs with `mpirun`. Alternatively, you can execute a one-shot command on that container with the `docker-compose exec` syntax, as follows: 
 
-    docker-compose exec --user mpirun --privileged mpi_head mpirun -n 2 python /home/mpirun/mpi4py_benchmarks/all_tests.py
-    ------------------------------------------------------- ----------- --------------------------------------------------
-    1.                                                      2.          3.
-
-Breaking the above command down:
-
-1. Execute command on node `mpi_head`
-2. Run on 2 MPI ranks
-3. Command to run (NB: the Python script needs to import MPI bindings)
-
-## Testing
-
-You can spin up a docker-compose cluster, run a battery of MPI4py tests and remove the cluster using a recipe provided in the included Makefile (handy for development):
-
-    make main
-
-
-## Credits
-
-This repository draws from work on https://github.com/dispel4py/ by O. Weidner and R. Filgueira 
+Now, you can SSH-copy your libraries/cases from your host to `/data` of the master node, and you're all set!
