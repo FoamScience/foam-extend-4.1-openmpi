@@ -111,7 +111,10 @@ RUN echo 'source ~/foam/foam-extend-4.1/etc/bashrc' >> ${HOME}/.bashrc
 
 WORKDIR /data
 
+USER root
 EXPOSE 22
 # Make sure SSH has the keys
 RUN ssh-keygen -A
 CMD ["/usr/sbin/sshd", "-D"]
+
+USER ${USER}
