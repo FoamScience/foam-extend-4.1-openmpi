@@ -115,6 +115,6 @@ USER root
 EXPOSE 22
 # Make sure SSH has the keys
 RUN ssh-keygen -A
-ENTRYPOINT ["/usr/sbin/sshd","-D"]
+CMD /usr/sbin/sshd -D
 
 USER ${USER}
