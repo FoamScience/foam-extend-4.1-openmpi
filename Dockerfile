@@ -21,7 +21,7 @@ RUN apt-get update -y && \
     apt-get install -y --no-install-recommends sudo apt-utils vim && \
     apt-get install -y --no-install-recommends openssh-server python-dev \
         gfortran libopenmpi-dev openmpi-bin openmpi-common openmpi-doc binutils && \
-    apt-get install -y --no-install-recommends git-core build-essential binutils-dev cmake flex \
+    apt-get install -y git-core build-essential binutils-dev cmake flex libfl-dev \
         zlib1g-dev libncurses5-dev curl bison \
         libxt-dev rpm mercurial graphviz gcc-7 g++-7 && \
     apt-get clean && apt-get purge && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -91,6 +91,7 @@ ENV TRIGGER 1
 # Get and Compile foam-extend-4.1
 # ------------------------------------------------------------
 
+USER openfoam
 
 ENV FOAM_REPO_URL git://github.com/Unofficial-Extend-Project-Mirror/foam-extend-foam-extend-4.0
 #ENV FOAM_REPO_URL git://git.code.sf.net/p/foam-extend/foam-extend-4.1
@@ -106,6 +107,7 @@ COPY 0001-compile-on-Ubuntu-20.04-with-system-MPI.patch .
 RUN git am 0001-compile-on-Ubuntu-20.04-with-system-MPI.patch
 SHELL ["/bin/bash", "-c"]
 RUN source etc/bashrc; ./Allwmake.firstInstall
+RUN echo 'source ~/foam/foam-extend-4.1/etc/bashrc' >> ${HOME}/.bashrc
 
 WORKDIR /data
 
