@@ -114,7 +114,7 @@ WORKDIR /data
 USER root
 EXPOSE 22
 # Make sure SSH has the keys
-RUN ssh-keygen -A
+RUN /usr/bin/ssh-keygen -A 
 CMD /usr/sbin/sshd -D
 
 USER ${USER}
