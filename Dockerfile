@@ -93,21 +93,21 @@ ENV TRIGGER 1
 
 USER openfoam
 
-ENV FOAM_REPO_URL git://github.com/Unofficial-Extend-Project-Mirror/foam-extend-foam-extend-4.0
-#ENV FOAM_REPO_URL git://git.code.sf.net/p/foam-extend/foam-extend-4.1
-
-RUN mkdir -p ${HOME}/foam
-WORKDIR ${HOME}/foam
-RUN git clone --depth 1 --single-branch --branch nextRelease ${FOAM_REPO_URL} foam-extend-4.1
-RUN git config --global user.email "you@example.com" && \
-    git config --global user.name "Your Name"
-
-WORKDIR ${HOME}/foam/foam-extend-4.1
-COPY 0001-compile-on-Ubuntu-20.04-with-system-MPI.patch .
-RUN git am 0001-compile-on-Ubuntu-20.04-with-system-MPI.patch
-SHELL ["/bin/bash", "-c"]
-RUN source etc/bashrc; ./Allwmake.firstInstall
-RUN echo 'source ~/foam/foam-extend-4.1/etc/bashrc' >> ${HOME}/.bashrc
+#ENV FOAM_REPO_URL git://github.com/Unofficial-Extend-Project-Mirror/foam-extend-foam-extend-4.0
+##ENV FOAM_REPO_URL git://git.code.sf.net/p/foam-extend/foam-extend-4.1
+#
+#RUN mkdir -p ${HOME}/foam
+#WORKDIR ${HOME}/foam
+#RUN git clone --depth 1 --single-branch --branch nextRelease ${FOAM_REPO_URL} foam-extend-4.1
+#RUN git config --global user.email "you@example.com" && \
+#    git config --global user.name "Your Name"
+#
+#WORKDIR ${HOME}/foam/foam-extend-4.1
+#COPY 0001-compile-on-Ubuntu-20.04-with-system-MPI.patch .
+#RUN git am 0001-compile-on-Ubuntu-20.04-with-system-MPI.patch
+#SHELL ["/bin/bash", "-c"]
+#RUN source etc/bashrc; ./Allwmake.firstInstall
+#RUN echo 'source ~/foam/foam-extend-4.1/etc/bashrc' >> ${HOME}/.bashrc
 
 WORKDIR /data
 
