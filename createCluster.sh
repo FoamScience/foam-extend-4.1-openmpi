@@ -6,7 +6,7 @@
 # - Compilation command (Here, ./Allwmake)
 
 ## Dependencies
-NET_NAME="basename $(basedir $0)""_net"
+NET_NAME="$(basename $(dirname $PWD/create))""_net"
 LIB_TAR_URL=
 CASE_URL=
 SLAVES_NUM=3
