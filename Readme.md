@@ -81,3 +81,19 @@ add commands to get and compile your libraries towards the end, and push a new i
 The sample `docker-compose.yml` file uses a pre-generated `foamscience/foam-extend-4.1-openmpi`
 image from Docker Hub. You can replace that with your new image and all containers will have
 your library pre-compiled.
+
+### How do I customize FE4 installation?
+
+You'll have to build your own image for that:
+
+1. On your local machine, fetch latest commit from FE4 sources.
+2. Run `git am 0001-compile-on-Ubuntu-20.04-with-system-MPI.patch`
+3. Edit the installation files as you like, then commit and create a patch file:
+   ```
+   > git add .
+   > git commit -m "My patch"
+   > git format-patch HEAD~1..HEAD
+   ```
+4. In `Dockerfile`, right after applying `0001-compile-on-Ubuntu-20.04-with-system-MPI.patch`,
+   you should copy and apply yours
+5. Build your image with the new Docker file.
