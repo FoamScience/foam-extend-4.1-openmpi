@@ -6,9 +6,9 @@
 # - Compilation command (Here, ./Allwmake)
 
 ## Dependencies
-NET_NAME="foam-extend-41-openmpi_net"
-LIB_TAR_URL=https://transfer.sh/FX8Yu2/amr.tar
-CASE_URL=https://transfer.sh/uAA7so/threeD.tar
+NET_NAME="basename $(basedir $0)""_net"
+LIB_TAR_URL=
+CASE_URL=
 SLAVES_NUM=3
 
 if ! command -v jq &> /dev/null
