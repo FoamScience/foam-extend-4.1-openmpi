@@ -48,48 +48,52 @@ done
 
 ##### 2. Compile a library, and run a case
 
-# Copy the library TAR and unpack in /data from master node
-docker-compose exec master curl "$LIB_TAR_URL" -o lib.tar
-docker-compose exec master tar -xvf lib.tar
+if [ -z "$LIB_TAR_URL" ]
+then
+    # Copy the library TAR and unpack in /data from master node
+    docker-compose exec master curl "$LIB_TAR_URL" -o lib.tar
+    docker-compose exec master tar -xvf lib.tar
+    
+    # Install library dependencies in each node (In parallel, then wait for the processes to finish)
+    count=0
+    for node in master "${slaves[@]}";
+        do 
+        docker-compose exec -T $node bash -c 'sudo apt update; sudo apt install -y bc' &
+        count+=1
+        pids[${count}]=$!
+    done
+    for pid in ${pids[*]}; do
+        wait $pid
+    done
+    
+    # Compile on master
+    docker-compose exec -T master bash -ic './Allwmake'
+    
+    # Compile on slaves and wait for all compilation processes to finish
+    count=0
+    for node in "${slaves[@]}";
+        do 
+        docker-compose exec -T $node bash -ic './Allwmake' &
+        count+=1
+        pids[${count}]=$!
+    done
+    wait $mpid
+    for pid in ${pids[*]}; do
+        wait $pid
+    done
+fi
 
-# Install library dependencies in each node (In parallel, then wait for the processes to finish)
-count=0
-for node in master "${slaves[@]}";
-    do 
-    docker-compose exec -T $node bash -c 'sudo apt update; sudo apt install -y bc' &
-    count+=1
-    pids[${count}]=$!
-done
-for pid in ${pids[*]}; do
-    wait $pid
-done
-
-# Start compiling on master and wait a little (for lnInclude to be generated)
-docker-compose exec -T master bash -ic './Allwmake' &
-mpid=$!
-sleep 3
-
-# Compile on slaves and wait for all compilation processes to finish
-count=0
-for node in "${slaves[@]}";
-    do 
-    docker-compose exec -T $node bash -ic './Allwmake' &
-    count+=1
-    pids[${count}]=$!
-done
-wait $mpid
-for pid in ${pids[*]}; do
-    wait $pid
-done
+if [ -z "$CASE_URL" ]
+then
+    # Get the case
+    docker-compose exec -T master bash -c "curl $CASE_URL -o case.tar; tar -xvf case.tar"
+fi
 
 # Make nodes aware of an environment variable
 for node in master "${slaves[@]}";
     do 
     docker-compose exec -T $node bash -c "echo 'export LBAMR_PROJECT=/data' >> ~/.bashrc"
 done
-
-# Get the case
-docker-compose exec -T master bash -c "curl $CASE_URL -o case.tar; tar -xvf case.tar"
 
 echo ""
 echo "OK."

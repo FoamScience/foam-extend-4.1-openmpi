@@ -45,28 +45,38 @@ to properly setup each master and slave node. This mainly involves:
 When you're done, `docker-compose down` will tear down the cluster but the `data`
 volume will be preserved (Running `./createCluster.sh` again will link to the same volume).
 
-### How do I create a decent cluster?
+### How do I run my cases?
 
-Assuming you're on Alpine Linux, Change what you have to change in `createCluster.sh` file,
-and:
-```
-> apk add jq
-> git clone https://github.com/FoamScience/foam-extend-4.1-openmpi mpi-cluster
-> cd mpi-cluster
-> ./createCluster.sh
+Assuming you're on Alpine Linux,
+
+
+0. Get the files:
+   ```
+   > apk add jq
+   > git clone https://github.com/FoamScience/foam-extend-4.1-openmpi mpi-cluster
+   > cd mpi-cluster
+   ```
+1. In `createCluster.sh` file:
+   - Change `LIB_TAR_URL` if you want to compile an external library
+   - Change `CASE_URL` (should point to a TAR file) if you want to get the case on cluster creation
+   - Change `SLAVES_NUM` to reflect the number of slaves you want to spawn
+2. Then (Will take some time, needs to pull a 900MB image and can peacefully omit some bash warnings):
+   ```
+   > ./createCluster.sh
+   ```
+3. Run `docker ps -a` to make sure everything is running fine.
+4. You can access the cluster through its master node. Once inside the container,
+   you can prepare a hosts file (from `/etc/hosts`) and run your case with it:
+   ```
+   > docker-compose exec master bash
+   (openfoam:/data)> cd case
+   (openfoam:/data)> mpirun --hostfile hosts solver -parallel
 ```
 
-Then, maybe `docker ps -a` to make sure everything is running fine.
-Now you can access the cluster through its master node:
-```
-> docker-compose exec master bash
-
-```
-
-### All good, but I don't want to compile libraries on each node
+### All good, but I don't want to compile libraries on each node each time
 
 If your libraries are getting larger, you can pick the [Dockerfile](Dockerfile),
-add commands to get and compile your library towards the end, and push a new image.
+add commands to get and compile your libraries towards the end, and push a new image.
 
 The sample `docker-compose.yml` file uses a pre-generated `foamscience/foam-extend-4.1-openmpi`
 image from Docker Hub. You can replace that with your new image and all containers will have
