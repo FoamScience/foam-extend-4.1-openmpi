@@ -48,7 +48,7 @@ done
 
 ##### 2. Compile a library, and run a case
 
-if [ -z "$LIB_TAR_URL" ]
+if [ ! -z "$LIB_TAR_URL" ]
 then
     # Copy the library TAR and unpack in /data from master node
     docker-compose exec master curl "$LIB_TAR_URL" -o lib.tar
@@ -83,7 +83,7 @@ then
     done
 fi
 
-if [ -z "$CASE_URL" ]
+if [ ! -z "$CASE_URL" ]
 then
     # Get the case
     docker-compose exec -T master bash -c "curl $CASE_URL -o case.tar; tar -xvf case.tar"
