@@ -1,44 +1,27 @@
-master:
-  image: fe4-mpi
-  ports: 
-   - "22"
-  volumes:
-   - data:/data
-  links: 
-   - slave
+version: "2"
 
-slave: 
-  image: fe4-mpi
-  volumes:
-   - data:/data
+services:
+  master:
+    image: foamscience/foam-extend-4.1-openmpi
+    ports: 
+      - "2222::22"
+    links: 
+      - slave
+    volumes:
+      - data:/data
+    networks:
+      - net
+
+  slave:
+    image: foamscience/foam-extend-4.1-openmpi
+    volumes:
+      - data:/data
+    networks:
+      - net
 
 volumes:
   data:
-    external: true
 
-# version: "2"
-
-# services:
-#   master:
-#     image: fe4-mpi
-#     ports: 
-#       - "22"
-#     links: 
-#       - slave
-#     volumes:
-#       - data:/data
-#     networks:
-#       - net
-
-#   slave:
-#     image: fe4-mpi
-#     networks:
-#       - net
-
-# volumes:
-#   data:
-#     external: true
-
-# networks:
-#   net:
-#     driver: bridge
+networks:
+  net:
+    driver: bridge
