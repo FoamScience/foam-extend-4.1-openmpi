@@ -39,9 +39,9 @@ sleep 3
 # Get all IPs in the network, with container names, and replace _ with -
 docker network inspect "$NET_NAME" \
     | jq -r '.[].Containers[] | .IPv4Address + " " + .Name' \
-    | tr '_' '-' > d_hosts
+    | tr '_' '-' | sed 's_/16__' > d_hosts
 # Add this hosts configuration to all containers
-for node in master "$slaves[@]";
+for node in master "${slaves[@]}";
     do 
     docker-compose exec -T $node sudo bash -ic "echo \"`cat d_hosts`\" >> /etc/hosts"
 done
@@ -54,7 +54,7 @@ docker-compose exec master tar -xvf lib.tar
 
 # Install library dependencies in each node (In parallel, then wait for the processes to finish)
 count=0
-for node in master "$slaves[@]";
+for node in master "${slaves[@]}";
     do 
     docker-compose exec -T $node bash -c 'sudo apt update; sudo apt install -y bc' &
     count+=1
@@ -71,7 +71,7 @@ sleep 3
 
 # Compile on slaves and wait for all compilation processes to finish
 count=0
-for node in "$slaves[@]";
+for node in "${slaves[@]}";
     do 
     docker-compose exec -T $node bash -ic './Allwmake' &
     count+=1
@@ -83,9 +83,13 @@ for pid in ${pids[*]}; do
 done
 
 # Make nodes aware of an environment variable
-for node in master "$slaves[@]";
+for node in master "${slaves[@]}";
     do 
     docker-compose exec -T $node bash -c "echo 'export LBAMR_PROJECT=/data' >> ~/.bashrc"
 done
 
-echo "\nOK."
+# Get the case
+docker-compose exec -T master bash -c "curl $CASE_URL -o case.tar; tar -xvf case.tar"
+
+echo ""
+echo "OK."

@@ -45,6 +45,24 @@ to properly setup each master and slave node. This mainly involves:
 When you're done, `docker-compose down` will tear down the cluster but the `data`
 volume will be preserved (Running `./createCluster.sh` again will link to the same volume).
 
+### How do I create a decent cluster?
+
+Assuming you're on Alpine Linux, Change what you have to change in `createCluster.sh` file,
+and:
+```
+> apk add jq
+> git clone https://github.com/FoamScience/foam-extend-4.1-openmpi mpi-cluster
+> cd mpi-cluster
+> ./createCluster.sh
+```
+
+Then, maybe `docker ps -a` to make sure everything is running fine.
+Now you can access the cluster through its master node:
+```
+> docker-compose exec master bash
+
+```
+
 ### All good, but I don't want to compile libraries on each node
 
 If your libraries are getting larger, you can pick the [Dockerfile](Dockerfile),
