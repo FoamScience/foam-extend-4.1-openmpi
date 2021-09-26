@@ -71,7 +71,7 @@ Assuming you're on Alpine Linux,
    > docker-compose exec master bash
    (openfoam:/data)> cd case
    (openfoam:/data)> mpirun --hostfile hosts solver -parallel
-```
+   ```
 
 ### All good, but I don't want to compile libraries on each node each time
 
